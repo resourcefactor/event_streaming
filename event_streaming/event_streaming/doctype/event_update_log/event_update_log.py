@@ -28,7 +28,8 @@ def notify_consumers(doc, event):
 		return
 
 	consumers = check_doctype_has_consumers(doc.doctype)
-	if consumers:
+	event_user = get_event_consumer_user(doc.doctype)
+	if consumers and doc.modified_by != event_user:
 		if event == "after_insert":
 			doc.flags.event_update_log = make_event_update_log(doc, update_type="Create")
 		elif event == "on_trash":
@@ -54,6 +55,22 @@ def check_doctype_has_consumers(doctype: str) -> bool:
 		)
 
 	return bool(frappe.cache().hget(ENABLED_DOCTYPES_CACHE_KEY, doctype, fetch_from_db))
+
+
+def get_event_consumer_user(doctype):
+	"""get doctype has event consumers for event streaming"""
+	event_doc = frappe.get_all(
+		"Event Consumer Document Type",
+		fields=['parent'],
+		filters={"ref_doctype": doctype, "status": "Approved", "unsubscribed": 0},
+		ignore_ddl=True,
+		order_by="modified desc",
+		limit=1
+		)
+	if event_doc and event_doc[0].get("parent"):
+		return frappe.get_value("Event Consumer", event_doc[0].get("parent"), "user")
+	return None
+
 
 
 def get_update(old, new, for_child=False):

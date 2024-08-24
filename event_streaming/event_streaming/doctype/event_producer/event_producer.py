@@ -231,7 +231,7 @@ def pull_producer_data():
 @frappe.whitelist()
 def pull_from_node(event_producer):
 	"""pull all updates after the last update timestamp from event producer site"""
-	event_producer = frappe.get_doc("Event Producer", event_producer)
+	event_producer = frappe.get_doc("Event Producer", event_producer.rstrip("/"))
 	producer_site = get_producer_site(event_producer.producer_url)
 	last_update = event_producer.get_last_update()
 
