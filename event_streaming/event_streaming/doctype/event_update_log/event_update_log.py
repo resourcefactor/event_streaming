@@ -72,7 +72,6 @@ def get_event_consumer_user(doctype):
 	return None
 
 
-
 def get_update(old, new, for_child=False):
 	"""
 	Get document objects with updates only
