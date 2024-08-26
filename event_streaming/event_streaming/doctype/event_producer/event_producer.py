@@ -161,7 +161,7 @@ class EventProducer(Document):
 
 	def update_event_consumer(self):
 		if self.is_producer_online():
-			producer_site = get_producer_site(self.producer_url)
+			producer_site = get_producer_site(self.producer_url.rstrip("/"))
 			event_consumer = producer_site.get_doc("Event Consumer", get_url().rstrip("/"))
 			event_consumer = frappe._dict(event_consumer)
 			if event_consumer:
